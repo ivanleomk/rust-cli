@@ -13,3 +13,7 @@ cargo run ../../ML-Notes/  --ignore-dirs .obsidian,assets,.git
 ```
 
 In this case, it'll go the `ML-Notes` directory and from there it will recursively traverse the file to find all files. Then we'll read in the file and find
+
+Here is a gif of it in actions
+
+![Warp Gif](./Warp.gif)
