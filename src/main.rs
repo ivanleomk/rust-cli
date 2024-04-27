@@ -57,11 +57,11 @@ fn main() {
                     "Replaced link: {} in file {}",
                     new_link, relative_path_to_root_dir
                 );
-                // let original_file_content =
-                //     fs::read_to_string(file).expect("Failed to read file for replacement");
-                // let replaced_content = original_file_content.replace(&cap[0], &new_link);
-                // fs::write(file, replaced_content)
-                //     .expect("Failed to write replaced content to file");
+                let original_file_content =
+                    fs::read_to_string(file).expect("Failed to read file for replacement");
+                let replaced_content = original_file_content.replace(&cap[0], &new_link);
+                fs::write(file, replaced_content)
+                    .expect("Failed to write replaced content to file");
             }
         }
     }
@@ -69,13 +69,8 @@ fn main() {
 
 fn is_invalid_path(path: &Path, ignore_dirs: &Vec<String>) -> bool {
     let path_str = path.to_string_lossy();
-    println!("Path as string: {}", path_str);
-
     let is_dir = path.is_dir();
-    println!("Is directory: {}", is_dir);
-
     let ends_with_md = path_str.ends_with(".md");
-    println!("Ends with '.md': {}", ends_with_md);
 
     let is_valid_dir_or_file = is_dir || ends_with_md;
 
