@@ -1,8 +1,16 @@
 [package]
-name = "cli"
+name = "MarkdownReplace"
 version = "0.1.0"
-edition = "2021"
+authors = ["Ivan Leo <ivanleomk@gmail.com>"]
+license = "MIT OR Apache-2.0"
+description = "A tool to help you replace all markdown links with absolute links"
+readme = "README.md"
+homepage = "https://github.com/ivanleomk/markdown-replace"
+repository = "https://github.com/ivanleomk/markdown-replace"
+keywords = ["cli", "markdown", "regex"]
+categories = ["command-line-utilities"]
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+clap = { version = "4.0", features = ["derive"] }
+regex = "1.5.4"
