@@ -57,21 +57,32 @@ fn main() {
                     "Replaced link: {} in file {}",
                     new_link, relative_path_to_root_dir
                 );
-                let original_file_content =
-                    fs::read_to_string(file).expect("Failed to read file for replacement");
-                let replaced_content = original_file_content.replace(&cap[0], &new_link);
-                fs::write(file, replaced_content)
-                    .expect("Failed to write replaced content to file");
+                // let original_file_content =
+                //     fs::read_to_string(file).expect("Failed to read file for replacement");
+                // let replaced_content = original_file_content.replace(&cap[0], &new_link);
+                // fs::write(file, replaced_content)
+                //     .expect("Failed to write replaced content to file");
             }
         }
     }
 }
 
 fn is_invalid_path(path: &Path, ignore_dirs: &Vec<String>) -> bool {
-    let path_str = path.to_string_lossy(); // Converts the path to a string
-    ignore_dirs
-        .iter()
-        .any(|ignore_dir| path_str.contains(ignore_dir))
+    let path_str = path.to_string_lossy();
+    println!("Path as string: {}", path_str);
+
+    let is_dir = path.is_dir();
+    println!("Is directory: {}", is_dir);
+
+    let ends_with_md = path_str.ends_with(".md");
+    println!("Ends with '.md': {}", ends_with_md);
+
+    let is_valid_dir_or_file = is_dir || ends_with_md;
+
+    !is_valid_dir_or_file
+        || ignore_dirs
+            .iter()
+            .any(|ignore_dir| path_str.contains(ignore_dir))
 }
 
 fn retrieve_record(
@@ -83,6 +94,7 @@ fn retrieve_record(
         return Ok(acc);
     }
 
+    println!("Exploring {}", path.to_str().unwrap());
     if path.is_file() {
         let mut new_acc = acc.clone();
         new_acc.insert(
@@ -99,4 +111,52 @@ fn retrieve_record(
     }
 
     Ok(acc)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_valid_markdown_file() {
+        let path = Path::new("example.md");
+        let ignore_dirs = vec!["temp".to_string()];
+        assert!(!is_invalid_path(path, &ignore_dirs));
+    }
+
+    #[test]
+    fn test_invalid_non_markdown_file() {
+        let path = Path::new("example.txt");
+        let ignore_dirs = vec!["temp".to_string()];
+        assert!(is_invalid_path(path, &ignore_dirs));
+    }
+
+    #[test]
+    fn test_ignored_directory_file() {
+        let path = Path::new("temp/example.md");
+        let ignore_dirs = vec!["temp".to_string()];
+        assert!(is_invalid_path(path, &ignore_dirs));
+    }
+
+    #[test]
+    fn test_ignored_directory() {
+        let path = Path::new("./fixtures/ignored_dir");
+        let ignore_dirs = vec!["ignored_dir".to_string()];
+        assert!(is_invalid_path(path, &ignore_dirs));
+    }
+
+    #[test]
+    fn test_non_ignored_directory() {
+        let path = Path::new("./src/example.md");
+        let ignore_dirs = vec!["temp".to_string()];
+        assert!(!is_invalid_path(path, &ignore_dirs));
+    }
+
+    #[test]
+    fn test_directory() {
+        let path = Path::new("./src");
+        let ignore_dirs = vec!["temp".to_string()];
+        assert!(path.is_dir(), "The path should point to a valid directory");
+        assert!(!is_invalid_path(path, &ignore_dirs));
+    }
 }
